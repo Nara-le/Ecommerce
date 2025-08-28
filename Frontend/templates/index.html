@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Life Style</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #d9e4f5, #f5e2d9);
+            background-size: 200%;
+            animation: softGlow 12s ease infinite;
+        }
+        @keyframes softGlow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 200% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .card-hover {
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            background: white;
+            border-radius: 12px;
+        }
+        .card-hover:hover {
+            transform: scale(1.03);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+            border-color: #f28b82;
+        }
+        .dropdown-menu {
+            display: none;
+            transition: all 0.3s ease;
+            transform-origin: top;
+            transform: scaleY(0);
+            border-radius: 8px;
+        }
+        .dropdown.active .dropdown-menu {
+            display: block;
+            transform: scaleY(1);
+        }
+        .modal {
+            animation: fadeIn 0.4s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .cart-item {
+            border-bottom: 1px solid #e5e7eb;
+            transition: background 0.2s ease;
+        }
+        .cart-item:hover {
+            background: #f9fafb;
+        }
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        .btn-primary {
+            background: linear-gradient(45deg, #f28b82, #fbc2eb);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(242, 139, 130, 0.3);
+            border-radius: 8px;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(45deg, #f07167, #f9b3e7);
+            transform: scale(1.03);
+            box-shadow: 0 6px 15px rgba(242, 139, 130, 0.5);
+        }
+        .btn-secondary {
+            background: linear-gradient(45deg, #a7d9f5, #c3e4f5);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(167, 217, 245, 0.3);
+            border-radius: 8px;
+        }
+        .btn-secondary:hover {
+            background: linear-gradient(45deg, #90cdf4, #b1daf5);
+            transform: scale(1.03);
+            box-shadow: 0 6px 15px rgba(167, 217, 245, 0.5);
+        }
+        .cart-count {
+            transition: all 0.2s ease;
+        }
+        .cart-count.updated {
+            transform: scale(1.2);
+            color: #f28b82;
+            font-weight: bold;
+        }
+        .product-image {
+            transition: transform 0.3s ease;
+        }
+        .product-image:hover {
+            transform: scale(1.05);
+        }
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.01); }
+            100% { transform: scale(1); }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="bg-white shadow-md sticky top-0 z-50" aria-label="Main navigation">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-500 to-pink-500 pulse">Life Style</h1>
+                </div>
+                <div class="flex items-center space-x-6">
+                    <div class="relative dropdown">
+                        <button onclick="toggleDropdown()" class="text-gray-800 hover:text-pink-500 flex items-center font-medium" aria-expanded="false" aria-controls="category-menu">
+                            Categories
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </button>
+                        <div id="category-menu" class="dropdown-menu absolute bg-white shadow-md mt-2 rounded-lg w-48 z-50 border border-blue-100">
+                            <button onclick="filterProducts('All')" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-50 hover:text-blue-500">All</button>
+                            <button onclick="filterProducts('Clothes')" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-50 hover:text-blue-500">Clothes</button>
+                            <button onclick="filterProducts('Shoes')" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-50 hover:text-blue-500">Shoes</button>
+                            <button onclick="filterProducts('Bags')" class="block w-full text-left px-4 py-2 text-gray-800 hover:bg-blue-50 hover:text-blue-500">Bags</button>
+                        </div>
+                    </div>
+                    <button onclick="openModal('cartModal')" class="text-gray-800 hover:text-pink-500 font-medium" aria-label="View cart">
+                        Cart (<span id="cartCount" class="cart-count">0</span>)
+                    </button>
+                    <button onclick="openModal('loginModal')" class="text-gray-800 hover:text-pink-500 font-medium" aria-label="Login">Login</button>
+                    <button onclick="openModal('registerModal')" class="btn-primary text-white px-5 py-2 rounded-lg font-medium" aria-label="Register">Register</button>
+                    <button onclick="openModal('orderStatusModal')" class="text-gray-800 hover:text-pink-500 font-medium" aria-label="Check order status">Order Status</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Products Section -->
+    <section id="products" class="py-16" aria-label="Product list">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500 mb-10 fade-in">Explore Stylish Finds</h2>
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" id="product-list"></div>
+        </div>
+    </section>
+
+    <!-- Product Details Modal -->
+    <div id="productDetailsModal" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center hidden modal" role="dialog" aria-labelledby="productDetailsName">
+        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-md">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4" id="productDetailsName"></h2>
+            <img id="productDetailsImage" class="w-full h-64 object-cover rounded-lg mb-4 product-image" alt="Product Image">
+            <p class="text-gray-600 mb-2" id="productDetailsDescription"></p>
+            <p class="text-pink-500 font-bold text-lg mb-2" id="productDetailsPrice"></p>
+            <p class="text-gray-600 mb-4" id="productDetailsStock"></p>
+            <div class="mb-4">
+                <label for="productQuantity" class="block text-gray-700 font-medium">Quantity</label>
+                <input type="number" id="productQuantity" min="1" value="1" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Select quantity">
+            </div>
+            <button onclick="addToCartFromModal()" class="w-full btn-primary text-white px-4 py-2 rounded-lg" aria-label="Add to cart">Add to Cart</button>
+            <button onclick="closeModal('productDetailsModal')" class="mt-3 text-gray-600 hover:text-pink-500 w-full text-center" aria-label="Close product details">Close</button>
+        </div>
+    </div>
+
+    <!-- Cart Modal -->
+    <div id="cartModal" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center hidden modal" role="dialog" aria-labelledby="cartModalTitle">
+        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-xl">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4" id="cartModalTitle">Your Cart</h2>
+            <div id="cartItems" class="mb-4"></div>
+            <p class="text-lg font-bold text-gray-800 mb-4">Total: $<span id="cartTotal">0.00</span></p>
+            <button onclick="proceedToCheckout()" class="w-full btn-primary text-white px-4 py-2 rounded-lg" aria-label="Proceed to checkout">Proceed to Checkout</button>
+            <button onclick="closeModal('cartModal')" class="mt-3 text-gray-600 hover:text-pink-500 w-full text-center" aria-label="Close cart">Close</button>
+        </div>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center hidden modal" role="dialog" aria-labelledby="loginModalTitle">
+        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4" id="loginModalTitle">Login</h2>
+            <div>
+                <label for="loginEmail" class="block text-gray-700 font-medium">Email</label>
+                <input type="email" id="loginEmail" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Email address">
+                <label for="loginPassword" class="block text-gray-700 mt-3 font-medium">Password</label>
+                <input type="password" id="loginPassword" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Password">
+                <button onclick="handleLogin()" class="w-full btn-primary text-white px-4 py-2 rounded-lg mt-4" aria-label="Login">Login</button>
+            </div>
+            <button onclick="closeModal('loginModal')" class="mt-3 text-gray-600 hover:text-pink-500 w-full text-center" aria-label="Close login modal">Close</button>
+        </div>
+    </div>
+
+    <!-- Register Modal -->
+    <div id="registerModal" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center hidden modal" role="dialog" aria-labelledby="registerModalTitle">
+        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4" id="registerModalTitle">Register</h2>
+            <div>
+                <label for="registerName" class="block text-gray-700 font-medium">Name</label>
+                <input type="text" id="registerName" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Full name">
+                <label for="registerEmail" class="block text-gray-700 mt-3 font-medium">Email</label>
+                <input type="email" id="registerEmail" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Email address">
+                <label for="registerPassword" class="block text-gray-700 mt-3 font-medium">Password</label>
+                <input type="password" id="registerPassword" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Password">
+                <label for="registerAddress" class="block text-gray-700 mt-3 font-medium">Address</label>
+                <input type="text" id="registerAddress" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Address">
+                <label for="registerPhone" class="block text-gray-700 mt-3 font-medium">Phone</label>
+                <input type="tel" id="registerPhone" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Phone number">
+                <button onclick="handleRegister()" class="w-full btn-primary text-white px-4 py-2 rounded-lg mt-4" aria-label="Register">Register</button>
+            </div>
+            <button onclick="closeModal('registerModal')" class="mt-3 text-gray-600 hover:text-pink-500 w-full text-center" aria-label="Close register modal">Close</button>
+        </div>
+    </div>
+
+    <!-- Order Status Modal -->
+    <div id="orderStatusModal" class="fixed inset-0 bg-gray-800 bg-opacity-70 flex items-center justify-center hidden modal" role="dialog" aria-labelledby="orderStatusModalTitle">
+        <div class="bg-white p-6 rounded-xl shadow-xl w-full max-w-sm">
+            <h2 class="text-2xl font-bold text-gray-800 mb-4" id="orderStatusModalTitle">Order Status</h2>
+            <div id="orderStatusContent">
+                <p class="text-gray-600 mb-3">Enter your order ID to check status.</p>
+                <input type="text" id="orderIdInput" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500" placeholder="Order ID" aria-label="Order ID">
+                <button onclick="checkOrderStatus()" class="w-full btn-primary text-white px-4 py-2 rounded-lg mt-3" aria-label="Check order status">Check Status</button>
+            </div>
+            <button onclick="closeModal('orderStatusModal')" class="mt-3 text-gray-600 hover:text-pink-500 w-full text-center" aria-label="Close order status modal">Close</button>
+        </div>
+    </div>
+
+    <!-- Checkout Page (Static) -->
+    <div id="checkoutPage" class="hidden min-h-screen py-16 bg-gradient-to-b from-blue-100 to-pink-100" aria-label="Checkout page">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-4xl font-bold text-center bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-pink-500 mb-10 fade-in">Complete Your Order</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                <div class="lg:col-span-2 bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Order Summary</h3>
+                    <div id="checkoutItems" class="mb-4"></div>
+                    <p class="text-lg font-bold text-gray-800">Total: $<span id="checkoutTotal">0.00</span></p>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-md">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-4">Billing Information</h3>
+                    <div class="mb-3">
+                        <label for="checkoutName" class="block text-gray-700 font-medium">Name</label>
+                        <input type="text" id="checkoutName" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" placeholder="Your Name" aria-label="Full name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="checkoutEmail" class="block text-gray-700 font-medium">Email</label>
+                        <input type="email" id="checkoutEmail" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" placeholder="Your Email" aria-label="Email address">
+                    </div>
+                    <div class="mb-3">
+                        <label for="checkoutAddress" class="block text-gray-700 font-medium">Address</label>
+                        <input type="text" id="checkoutAddress" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" placeholder="Your Address" aria-label="Address">
+                    </div>
+                    <div class="mb-3">
+                        <label for="paymentMethod" class="block text-gray-700 font-medium">Payment Method</label>
+                        <select id="paymentMethod" class="w-full px-3 py-2 border rounded-lg mt-1 focus:ring-2 focus:ring-pink-500" aria-label="Select payment method">
+                            <option>Credit Card</option>
+                            <option>PayPal</option>
+                            <option>Bank Transfer</option>
+                        </select>
+                    </div>
+                    <button onclick="placeOrder()" class="w-full btn-primary text-white px-4 py-2 rounded-lg" aria-label="Place order">Place Order</button>
+                    <button onclick="backToProducts()" class="mt-3 btn-secondary text-white px-4 py-2 rounded-lg w-full" aria-label="Back to products">Back to Products</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample product data with unique IDs
+        const products = [
+            { id: 1, name: "Casual Shirt", price: 15.99, category: "Clothes", description: "Soft and comfortable cotton shirt, perfect for everyday wear.", stock: 50, image: "https://cdn.media.amplience.net/i/mrpricegroup/07_101198419_SI_00" },
+            { id: 2, name: "Formal Shirt", price: 25.99, category: "Clothes", description: "Elegant formal shirt for professional occasions.", stock: 40, image: "https://cdn.shopify.com/s/files/1/0266/6276/4597/files/Group_1-03_28e7cab7-92f1-46f0-a5c0-30194b1ae35e.jpg?v=1665137073" },
+            { id: 3, name: "Leather Sneakers", price: 49.99, category: "Shoes", description: "Stylish leather sneakers for a modern look.", stock: 30, image: "https://tse4.mm.bing.net/th/id/OIP.v18ZltEQwqKarmFWh7JHVgHaKT?cb=thfvnext&rs=1&pid=ImgDetMain&o=7&rm=3" },
+            { id: 4, name: "Running Shoes", price: 59.99, category: "Shoes", description: "Lightweight running shoes for ultimate comfort.", stock: 25, image: "https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1545161327-1543201724-brooks-levitate-2-1531595124.jpg?crop=1xw:1xh;center,top" },
+            { id: 5, name: "Designer Handbag", price: 79.99, category: "Bags", description: "Elegant designer handbag for any occasion.", stock: 20, image: "https://tse1.mm.bing.net/th/id/OIP.zmybsrIM0T_G0hT1t0QVxQHaHa?cb=thfvnext&rs=1&pid=ImgDetMain&o=7&rm=3" },
+            { id: 1, name: "Casual Shirt", price: 15.99, category: "Clothes", description: "Soft and comfortable cotton shirt, perfect for everyday wear.", stock: 50, image: "https://tse3.mm.bing.net/th/id/OIP.sLNyLMEs3Sh_RMFHwkjYVwHaJ6?cb=thfvnext&rs=1&pid=ImgDetMain&o=7&rm=3" },
+            { id: 2, name: "Formal Shirt", price: 25.99, category: "Clothes", description: "Elegant formal shirt for professional occasions.", stock: 40, image: "https://guysworld.in/wp-content/uploads/2019/03/8175jCE139L._UL1500_-1.jpg" },
+            { id: 3, name: "Leather Sneakers", price: 49.99, category: "Shoes", description: "Stylish leather sneakers for a modern look.", stock: 30, image: "https://i.pinimg.com/originals/6b/3a/38/6b3a3898f70a8e3e5ffd31fb1cb22db0.jpg" },
+            { id: 4, name: "Running Shoes", price: 59.99, category: "Shoes", description: "Lightweight running shoes for ultimate comfort.", stock: 25, image: "https://cdn11.bigcommerce.com/s-8lwkyk05bo/images/stencil/590x590/products/30499/370389/media__83568.1677856030.jpg?c=2" },
+            { id: 5, name: "Designer Handbag", price: 79.99, category: "Bags", description: "Elegant designer handbag for any occasion.", stock: 20, image: "https://png.pngtree.com/png-clipart/20231008/original/pngtree-luxury-designer-handbag-a-symbol-of-exquisite-transparent-background-png-image_13290727.png" },
+        ];
+
+        // Sample order data
+        let orders = JSON.parse(localStorage.getItem('orders')) || [
+            { orderId: "12345", customerEmail: "user@example.com", date: "2025-08-27", status: "Shipped", paymentMethod: "Credit Card", items: [{ productId: 1, quantity: 2, priceAtOrder: 15.99 }, { productId: 3, quantity: 1, priceAtOrder: 49.99 }] }
+        ];
+
+        // CRS-JS: Custom Cart Management
+        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+
+        function saveCartToStorage() {
+            localStorage.setItem('cart', JSON.stringify(cart));
+        }
+
+        function saveOrdersToStorage() {
+            localStorage.setItem('orders', JSON.stringify(orders));
+        }
+
+        function updateCartDisplay() {
+            const cartItems = document.getElementById('cartItems');
+            const cartCount = document.getElementById('cartCount');
+            const cartTotal = document.getElementById('cartTotal');
+            cartItems.innerHTML = '';
+            let total = 0;
+            if (cart.length === 0) {
+                cartItems.innerHTML = '<p class="text-gray-600 text-center fade-in">Your cart is empty.</p>';
+            } else {
+                cart.forEach((item, index) => {
+                    const itemTotal = item.quantity * item.priceAtOrder;
+                    total += itemTotal;
+                    cartItems.innerHTML += `
+                        <div class="cart-item flex justify-between items-center py-3 fade-in">
+                            <div class="flex items-center space-x-3">
+                                <img src="${item.product.image}" alt="${item.product.name}" class="w-14 h-14 object-cover rounded-lg product-image">
+                                <div>
+                                    <h3 class="text-base font-semibold text-gray-800">${item.product.name}</h3>
+                                    <p class="text-gray-600 text-sm">$${item.priceAtOrder.toFixed(2)} x ${item.quantity}</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center space-x-2">
+                                <button onclick="updateCartQuantity(${index}, -1)" class="bg-gray-200 px-2 py-1 rounded-lg hover:bg-blue-100" aria-label="Decrease quantity of ${item.product.name}">-</button>
+                                <span class="text-gray-800">${item.quantity}</span>
+                                <button onclick="updateCartQuantity(${index}, 1)" class="bg-gray-200 px-2 py-1 rounded-lg hover:bg-blue-100" aria-label="Increase quantity of ${item.product.name}">+</button>
+                                <button onclick="removeFromCart(${index})" class="text-red-600 hover:text-red-800 text-sm font-medium" aria-label="Remove ${item.product.name} from cart">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            cartCount.textContent = totalItems;
+            if (totalItems > 0) {
+                cartCount.classList.add('updated');
+                setTimeout(() => cartCount.classList.remove('updated'), 300);
+            }
+            cartTotal.textContent = total.toFixed(2);
+            saveCartToStorage();
+        }
+
+        function addToCartFromModal() {
+            const product = products.find(p => p.id === selectedProductId);
+            const quantity = parseInt(document.getElementById('productQuantity').value);
+            if (quantity < 1) {
+                alert('Quantity must be at least 1.');
+                return;
+            }
+            if (quantity > product.stock) {
+                alert(`Sorry, only ${product.stock} items in stock.`);
+                return;
+            }
+            const existingItem = cart.find(item => item.product.id === product.id);
+            if (existingItem) {
+                existingItem.quantity += quantity;
+                if (existingItem.quantity > product.stock) {
+                    existingItem.quantity = product.stock;
+                    alert(`Adjusted quantity to maximum stock: ${product.stock}`);
+                }
+            } else {
+                cart.push({ product, quantity, priceAtOrder: product.price });
+            }
+            updateCartDisplay();
+            alert(`${product.name} (x${quantity}) added to cart!`);
+            closeModal('productDetailsModal');
+        }
+
+        function updateCartQuantity(index, change) {
+            const item = cart[index];
+            const newQuantity = item.quantity + change;
+            if (newQuantity < 1) {
+                removeFromCart(index);
+                return;
+            }
+            if (newQuantity > item.product.stock) {
+                alert(`Sorry, only ${item.product.stock} items in stock.`);
+                return;
+            }
+            item.quantity = newQuantity;
+            updateCartDisplay();
+        }
+
+        function removeFromCart(index) {
+            cart.splice(index, 1);
+            updateCartDisplay();
+        }
+
+        function proceedToCheckout() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            closeModal('cartModal');
+            document.getElementById('products').classList.add('hidden');
+            document.getElementById('checkoutPage').classList.remove('hidden');
+            const checkoutItems = document.getElementById('checkoutItems');
+            const checkoutTotal = document.getElementById('checkoutTotal');
+            checkoutItems.innerHTML = '';
+            let total = 0;
+            cart.forEach(item => {
+                const itemTotal = item.quantity * item.priceAtOrder;
+                total += itemTotal;
+                checkoutItems.innerHTML += `
+                    <div class="flex justify-between items-center py-2 fade-in">
+                        <div class="flex items-center space-x-3">
+                            <img src="${item.product.image}" alt="${item.product.name}" class="w-14 h-14 object-cover rounded-lg product-image">
+                            <div>
+                                <h3 class="text-base font-semibold text-gray-800">${item.product.name}</h3>
+                                <p class="text-gray-600 text-sm">$${item.priceAtOrder.toFixed(2)} x ${item.quantity}</p>
+                            </div>
+                        </div>
+                        <p class="text-gray-800 font-semibold">$${itemTotal.toFixed(2)}</p>
+                    </div>
+                `;
+            });
+            checkoutTotal.textContent = total.toFixed(2);
+        }
+
+        function placeOrder() {
+            if (cart.length === 0) {
+                alert('Your cart is empty!');
+                return;
+            }
+            const name = document.getElementById('checkoutName').value;
+            const email = document.getElementById('checkoutEmail').value;
+            const address = document.getElementById('checkoutAddress').value;
+            const paymentMethod = document.getElementById('paymentMethod').value;
+            if (!name || !email || !address) {
+                alert('Please fill in all billing information.');
+                return;
+            }
+            const orderId = `ORD-${Date.now()}`;
+            const order = {
+                orderId,
+                customerEmail: email,
+                date: new Date().toISOString().split('T')[0],
+                status: 'Pending',
+                paymentMethod,
+                items: cart.map(item => ({
+                    productId: item.product.id,
+                    quantity: item.quantity,
+                    priceAtOrder: item.priceAtOrder
+                }))
+            };
+            orders.push(order);
+            cart.forEach(item => {
+                const product = products.find(p => p.id === item.product.id);
+                product.stock -= item.quantity;
+            });
+            cart = [];
+            saveOrdersToStorage();
+            saveCartToStorage();
+            updateCartDisplay();
+            alert(`Order placed successfully! Order ID: ${orderId}`);
+            backToProducts();
+            displayProducts();
+        }
+
+        function backToProducts() {
+            document.getElementById('checkoutPage').classList.add('hidden');
+            document.getElementById('products').classList.remove('hidden');
+        }
+
+        function displayProducts(category = 'All') {
+            const productList = document.getElementById('product-list');
+            productList.innerHTML = '';
+            const filteredProducts = category === 'All' ? products : products.filter(product => product.category === category);
+            if (filteredProducts.length === 0) {
+                productList.innerHTML = '<p class="text-gray-600 col-span-full text-center fade-in">No products found in this category.</p>';
+                return;
+            }
+            filteredProducts.forEach(product => {
+                const productCard = `
+                    <div class="bg-white rounded-lg shadow-md p-5 card-hover cursor-pointer fade-in" onclick="showProductDetails(${product.id})" role="button" tabindex="0" aria-label="View details for ${product.name}">
+                        <img src="${product.image}" alt="${product.name}" class="w-full h-56 object-cover rounded-lg mb-3 product-image">
+                        <h3 class="text-base font-semibold text-gray-800">${product.name}</h3>
+                        <p class="text-gray-600 text-sm">${product.description}</p>
+                        <p class="text-pink-500 font-bold text-base mt-2">$${product.price.toFixed(2)}</p>
+                    </div>
+                `;
+                productList.innerHTML += productCard;
+            });
+            document.querySelectorAll('.card-hover').forEach(card => {
+                card.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        card.click();
+                    }
+                });
+            });
+        }
+
+        function filterProducts(category) {
+            displayProducts(category);
+            toggleDropdown();
+        }
+
+        function toggleDropdown() {
+            const dropdown = document.querySelector('.dropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        let selectedProductId = null;
+        function showProductDetails(productId) {
+            const product = products.find(p => p.id === productId);
+            selectedProductId = productId;
+            document.getElementById('productDetailsName').textContent = product.name;
+            document.getElementById('productDetailsImage').src = product.image;
+            document.getElementById('productDetailsImage').alt = product.name;
+            document.getElementById('productDetailsDescription').textContent = product.description;
+            document.getElementById('productDetailsPrice').textContent = `$${product.price.toFixed(2)}`;
+            document.getElementById('productDetailsStock').textContent = `In Stock: ${product.stock}`;
+            document.getElementById('productQuantity').value = 1;
+            openModal('productDetailsModal');
+        }
+
+        function checkOrderStatus() {
+            const orderId = document.getElementById('orderIdInput').value;
+            const order = orders.find(o => o.orderId === orderId);
+            const orderStatusContent = document.getElementById('orderStatusContent');
+            if (order) {
+                let itemsHtml = '<ul class="mt-2 space-y-1">';
+                order.items.forEach(item => {
+                    const product = products.find(p => p.id === item.productId);
+                    itemsHtml += `<li class="text-gray-600 text-sm">${product.name} - Quantity: ${item.quantity}, Price: $${item.priceAtOrder.toFixed(2)}</li>`;
+                });
+                itemsHtml += '</ul>';
+                orderStatusContent.innerHTML = `
+                    <p class="text-gray-800 text-sm"><strong>Order ID:</strong> ${order.orderId}</p>
+                    <p class="text-gray-800 text-sm"><strong>Date:</strong> ${order.date}</p>
+                    <p class="text-gray-800 text-sm"><strong>Status:</strong> ${order.status}</p>
+                    <p class="text-gray-800 text-sm"><strong>Payment Method:</strong> ${order.paymentMethod}</p>
+                    <p class="text-gray-800 mt-2 text-sm"><strong>Items:</strong></p>${itemsHtml}
+                    <button onclick="checkOrderStatus()" class="w-full btn-primary text-white px-4 py-2 rounded-lg mt-3" aria-label="Check another order">Check Another</button>
+                `;
+            } else {
+                orderStatusContent.innerHTML = `
+                    <p class="text-red-600 mb-3 fade-in text-sm">Order not found.</p>
+                    <input type="text" id="orderIdInput" class="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-pink-500" placeholder="Order ID" aria-label="Order ID">
+                    <button onclick="checkOrderStatus()" class="w-full btn-primary text-white px-4 py-2 rounded-lg mt-3" aria-label="Check order status">Check Status</button>
+                `;
+            }
+        }
+
+        function openModal(modalId) {
+            document.querySelectorAll('.modal, #checkoutPage').forEach(el => el.classList.add('hidden'));
+            document.getElementById(modalId).classList.remove('hidden');
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.add('hidden');
+        }
+
+        function handleLogin() {
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            if (!email || !password) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            alert(`Login attempt with email: ${email}`);
+            closeModal('loginModal');
+        }
+
+        function handleRegister() {
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const address = document.getElementById('registerAddress').value;
+            const phone = document.getElementById('registerPhone').value;
+            if (!name || !email || !password || !address || !phone) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            alert(`Registered user: ${name}`);
+            closeModal('registerModal');
+        }
+
+        document.addEventListener('click', function(event) {
+            const dropdown = document.querySelector('.dropdown');
+            if (!dropdown.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        // Initialize
+        displayProducts();
+        updateCartDisplay();
+    </script>
+</body>
+</html>
